@@ -1,0 +1,720 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>RevOps Control Room</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg: #f2f0ea;
+    --surface: #ffffff;
+    --surface-2: #e9e6dd;
+    --surface-3: #ddd9cd;
+    --text-primary: #16150f;
+    --text-secondary: #55534a;
+    --text-muted: #8a877c;
+    --border: rgba(20,20,15,0.11);
+    --border-strong: rgba(20,20,15,0.20);
+    --accent: #1f6f63;
+    --accent-ink: #0f4a41;
+    --accent-soft: #dcefe9;
+    --accent-soft-strong:#c3e3da;
+    --good: #0ca30c;
+    --good-soft: #e3f6e0;
+    --warning: #b9770a;
+    --warning-soft: #fbecd2;
+    --critical: #d03b3b;
+    --critical-soft: #fbe1df;
+    --series-meta: #2a78d6;
+    --series-meta-soft: #dbe9fb;
+    --series-tiktok: #eb6834;
+    --series-tiktok-soft: #fbe3d6;
+    --seq-1: #cde2fb;
+    --seq-2: #86b6ef;
+    --seq-3: #3987e5;
+    --seq-4: #1c5cab;
+    --shadow: 0 1px 2px rgba(20,20,15,0.06), 0 8px 24px -12px rgba(20,20,15,0.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg: #101210;
+      --surface: #191b18;
+      --surface-2: #212420;
+      --surface-3: #2b2e29;
+      --text-primary: #f3f2ec;
+      --text-secondary: #c7c4b7;
+      --text-muted: #8d8b81;
+      --border: rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.18);
+      --accent: #3fab9b;
+      --accent-ink: #9fe0d3;
+      --accent-soft: rgba(63,171,155,0.16);
+      --accent-soft-strong: rgba(63,171,155,0.26);
+      --good: #35c235;
+      --good-soft: rgba(53,194,53,0.14);
+      --warning: #f0a93a;
+      --warning-soft: rgba(240,169,58,0.14);
+      --critical: #ea6a6a;
+      --critical-soft: rgba(234,106,106,0.15);
+      --series-meta: #3987e5;
+      --series-meta-soft: rgba(57,135,229,0.16);
+      --series-tiktok: #d95926;
+      --series-tiktok-soft: rgba(217,89,38,0.18);
+      --seq-1: #184f95;
+      --seq-2: #1c5cab;
+      --seq-3: #3987e5;
+      --seq-4: #86b6ef;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -10px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg: #101210;
+    --surface: #191b18;
+    --surface-2: #212420;
+    --surface-3: #2b2e29;
+    --text-primary: #f3f2ec;
+    --text-secondary: #c7c4b7;
+    --text-muted: #8d8b81;
+    --border: rgba(255,255,255,0.10);
+    --border-strong: rgba(255,255,255,0.18);
+    --accent: #3fab9b;
+    --accent-ink: #9fe0d3;
+    --accent-soft: rgba(63,171,155,0.16);
+    --accent-soft-strong: rgba(63,171,155,0.26);
+    --good: #35c235;
+    --good-soft: rgba(53,194,53,0.14);
+    --warning: #f0a93a;
+    --warning-soft: rgba(240,169,58,0.14);
+    --critical: #ea6a6a;
+    --critical-soft: rgba(234,106,106,0.15);
+    --series-meta: #3987e5;
+    --series-meta-soft: rgba(57,135,229,0.16);
+    --series-tiktok: #d95926;
+    --series-tiktok-soft: rgba(217,89,38,0.18);
+    --seq-1: #184f95;
+    --seq-2: #1c5cab;
+    --seq-3: #3987e5;
+    --seq-4: #86b6ef;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -10px rgba(0,0,0,0.5);
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-inline: 20px;
+    padding-block: 0 40px;
+  }
+  .wrap{ max-width: 1120px; margin: 0 auto; }
+  h1,h2,h3{ font-family: "Archivo", "IBM Plex Sans", sans-serif; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+  .mono{ font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  a{ color: var(--accent-ink); }
+
+  /* Top bar */
+  .topbar{
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    margin-inline: -20px; padding-inline: 20px;
+  }
+  .topbar-inner{ max-width: 1120px; margin: 0 auto; padding-block: 14px 10px; }
+  .topbar-row{ display:flex; align-items:baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .brand h1{ font-size: 1.35rem; font-weight: 800; }
+  .brand .sub{ color: var(--text-muted); font-size: 0.8rem; }
+  .updated{ font-size: 0.74rem; color: var(--text-muted); text-align:right; }
+  .updated b{ color: var(--text-secondary); font-weight: 600; }
+  .nav{ display:flex; gap: 6px; overflow-x:auto; padding-block: 10px 4px; margin-top: 4px; scrollbar-width: none; }
+  .nav::-webkit-scrollbar{ display:none; }
+  .nav a{
+    flex: none; text-decoration:none; color: var(--text-secondary);
+    font-size: 0.78rem; font-weight: 600; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--border); white-space:nowrap;
+  }
+  .nav a:hover{ border-color: var(--border-strong); color: var(--text-primary); }
+
+  section{ padding-block: 30px 6px; scroll-margin-top: 96px; }
+  .section-head{ display:flex; align-items:end; justify-content:space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .section-head h2{ font-size: 1.05rem; font-weight: 700; }
+  .section-head .eyebrow{ display:block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 4px; }
+  .section-note{ font-size: 0.78rem; color: var(--text-muted); max-width: 46ch; text-align:right; }
+
+  /* KR strip */
+  .kr-strip{ display:grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .kr-card{
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; box-shadow: var(--shadow); position:relative; overflow:hidden;
+  }
+  .kr-card .kr-label{ font-size: 0.72rem; font-weight: 700; text-transform:uppercase; letter-spacing:0.06em; color: var(--text-muted); }
+  .kr-card .kr-value{ font-family:"IBM Plex Mono"; font-size: 1.9rem; font-weight: 600; margin-top: 4px; }
+  .kr-card .kr-target{ font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+  .kr-bar{ height: 6px; border-radius: 4px; background: var(--surface-2); margin-top: 12px; overflow:hidden; }
+  .kr-bar > span{ display:block; height:100%; border-radius:4px; }
+
+  /* stat tiles */
+  .tile-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .tile{
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 13px 14px; display:flex; flex-direction:column; gap: 4px; box-shadow: var(--shadow);
+  }
+  .tile .t-label{ font-size: 0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color: var(--text-muted); }
+  .tile .t-value{ font-family:"IBM Plex Mono"; font-size: 1.28rem; font-weight:600; }
+  .tile .t-delta{ font-size: 0.72rem; font-weight:600; display:flex; align-items:center; gap:4px; }
+  .tile .t-delta.up{ color: var(--critical); }
+  .tile .t-delta.down.bad{ color: var(--critical); }
+  .tile .t-delta.down.good{ color: var(--good); }
+  .tile .t-delta.up.good{ color: var(--good); }
+  .tile .t-foot{ font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+  .tile.flag{ border-color: var(--warning); box-shadow: 0 0 0 1px var(--warning) inset, var(--shadow); }
+
+  /* generic card */
+  .card{ background: var(--surface); border:1px solid var(--border); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .three-col{ display:grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+
+  /* compare bars (meta vs tiktok) */
+  .compare{ display:flex; flex-direction:column; gap: 14px; }
+  .compare-metric .cm-label{ font-size: 0.78rem; font-weight:700; margin-bottom:6px; }
+  .cm-row{ display:flex; align-items:center; gap: 8px; margin-bottom: 5px; }
+  .cm-swatch{ width:8px; height:8px; border-radius:50%; flex:none; }
+  .cm-name{ font-size: 0.72rem; color: var(--text-secondary); width: 54px; flex:none; }
+  .cm-track{ flex:1; background: var(--surface-2); border-radius: 4px; height: 14px; overflow:hidden; }
+  .cm-fill{ height:100%; border-radius: 4px; display:flex; align-items:center; }
+  .cm-val{ font-family:"IBM Plex Mono"; font-size: 0.74rem; font-weight:600; width: 58px; text-align:right; flex:none; }
+
+  /* funnel bars */
+  .funnel{ display:flex; align-items:flex-end; gap: 14px; height: 150px; padding-top: 10px; }
+  .funnel-col{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:6px; height:100%; }
+  .funnel-bar{ width: 100%; max-width: 46px; border-radius: 4px 4px 2px 2px; }
+  .funnel-pct{ font-family:"IBM Plex Mono"; font-size: 0.82rem; font-weight:700; }
+  .funnel-lbl{ font-size: 0.68rem; color: var(--text-muted); text-align:center; }
+
+  /* status mix bar */
+  .mix-bar{ display:flex; height: 26px; border-radius: 6px; overflow:hidden; border:1px solid var(--border); }
+  .mix-legend{ display:flex; gap: 16px; margin-top: 10px; flex-wrap:wrap; }
+  .mix-legend .li{ display:flex; align-items:center; gap:6px; font-size: 0.76rem; color: var(--text-secondary); }
+  .dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+
+  /* reason list */
+  .reason{ display:flex; align-items:center; gap: 10px; margin-bottom: 8px; }
+  .reason .r-label{ font-size: 0.76rem; width: 220px; flex:none; color: var(--text-secondary); }
+  .reason .r-track{ flex:1; height: 10px; background: var(--surface-2); border-radius:3px; overflow:hidden; }
+  .reason .r-fill{ height:100%; background: var(--seq-3); border-radius: 3px; }
+  .reason .r-val{ font-family:"IBM Plex Mono"; font-size: 0.74rem; width: 48px; text-align:right; flex:none; }
+
+  /* team */
+  .team-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .person{ background: var(--surface); border:1px solid var(--border); border-radius: 14px; padding: 16px 16px; box-shadow: var(--shadow); display:flex; flex-direction:column; gap:10px; }
+  .person-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .person-name{ font-weight:700; font-size:0.95rem; }
+  .person-role{ font-size:0.72rem; color: var(--text-muted); }
+  .chip{ font-size: 0.66rem; font-weight:700; padding: 3px 9px; border-radius:999px; white-space:nowrap; text-transform:uppercase; letter-spacing:0.03em; }
+  .chip.good{ background: var(--good-soft); color: var(--good); }
+  .chip.warning{ background: var(--warning-soft); color: var(--warning); }
+  .chip.critical{ background: var(--critical-soft); color: var(--critical); }
+  .chip.muted{ background: var(--surface-2); color: var(--text-muted); }
+  .load-row{ display:flex; align-items:center; gap:8px; }
+  .load-track{ flex:1; height: 8px; border-radius:4px; background: var(--surface-2); overflow:hidden; }
+  .load-fill{ height:100%; border-radius:4px; }
+  .load-txt{ font-family:"IBM Plex Mono"; font-size: 0.72rem; color: var(--text-secondary); white-space:nowrap; }
+  .person ul{ margin:0; padding-left: 16px; font-size: 0.78rem; color: var(--text-secondary); display:flex; flex-direction:column; gap:4px; }
+  .person ul li::marker{ color: var(--text-muted); }
+  .person .note{ font-size: 0.75rem; color: var(--text-muted); border-top:1px dashed var(--border); padding-top:8px; }
+
+  /* insight cards */
+  .insight-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .insight{ background: var(--surface); border:1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .insight.crit{ border-left-color: var(--critical); }
+  .insight.warn{ border-left-color: var(--warning); }
+  .insight.good{ border-left-color: var(--good); }
+  .insight h3{ font-size: 0.9rem; font-weight:700; margin-bottom:6px; }
+  .insight p{ font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height:1.5; }
+  .insight .tag{ font-size: 0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color: var(--text-muted); display:block; margin-bottom:6px; }
+
+  /* directives */
+  .directive{ display:flex; gap: 12px; align-items:flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .directive:last-child{ border-bottom:none; }
+  .directive .num{ font-family:"IBM Plex Mono"; font-size: 0.75rem; color: var(--text-muted); width: 18px; flex:none; padding-top:2px; }
+  .directive .to{ font-size: 0.68rem; font-weight:700; text-transform:uppercase; color: var(--accent-ink); letter-spacing:0.04em; }
+  .directive p{ margin: 3px 0 0; font-size: 0.85rem; color: var(--text-primary); }
+
+  .gap-list{ display:flex; flex-direction:column; gap:10px; }
+  .gap-item{ display:flex; gap:10px; align-items:flex-start; font-size: 0.85rem; color: var(--text-secondary); }
+  .gap-item b{ color: var(--text-primary); }
+  .gap-item .gdot{ width:6px; height:6px; border-radius:50%; background: var(--text-muted); margin-top:7px; flex:none; }
+
+  footer{ margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 0.74rem; color: var(--text-muted); }
+
+  @media (max-width: 860px){
+    .team-grid{ grid-template-columns: repeat(2,1fr); }
+    .insight-grid{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px){
+    .kr-strip{ grid-template-columns: 1fr; }
+    .tile-grid{ grid-template-columns: repeat(2,1fr); }
+    .two-col, .three-col{ grid-template-columns: 1fr; }
+    .team-grid{ grid-template-columns: 1fr; }
+    .section-note{ text-align:left; }
+    .reason .r-label{ width: 150px; }
+    .updated{ text-align:left; }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-row">
+      <div class="brand">
+        <h1>RevOps Control Room</h1>
+        <span class="sub">Musaad Academy · Karim's daily window</span>
+      </div>
+      <div class="updated" id="sync-status">Refreshed from the dashboard <b>Oct 3, 2026, ~3:45 PM Riyadh</b> (dashboard sources synced 06:05–06:12 Riyadh). September figures are final (Sep 1–30); October is an early read (Oct 1–3, today partial). Weekly comparison: Sep 26–Oct 2 vs. Sep 19–25.<br>Auto-refreshes daily 8:00 AM Riyadh · falls back to last-known numbers if the refresh can't reach the dashboard</div>
+    </div>
+    <nav class="nav">
+      <a href="#kr">KRs</a>
+      <a href="#numbers">Monthly numbers</a>
+      <a href="#marketing">Marketing</a>
+      <a href="#sales">Sales (Maged)</a>
+      <a href="#engagement">Engagement &amp; retention</a>
+      <a href="#team">Team &amp; open tasks</a>
+      <a href="#insights">Insights</a>
+      <a href="#directives">Today's directives</a>
+      <a href="#gaps">Open decisions</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section id="kr">
+    <div class="section-head">
+      <div><span class="eyebrow">The two numbers that matter</span><h2>Key Results</h2></div>
+    </div>
+    <div class="kr-strip">
+      <div class="kr-card">
+        <div class="kr-label">Revenue — Cash Collected (September, final)</div>
+        <div class="kr-value">328,327 <span style="font-size:1rem;font-weight:500;color:var(--text-muted)">SAR</span></div>
+        <div class="kr-target" style="color:var(--warning)">▲ 3.2% vs Aug 1–30 · but new sales finished ▼ 41.1% · Oct 1–3 early read: 27,345 SAR (▼ 22.8% vs Sep 1–3)</div>
+        <div class="kr-bar"><span style="width:95%;background:var(--accent)"></span></div>
+      </div>
+      <div class="kr-card">
+        <div class="kr-label">Churn — rolling last 30 days (Overview)</div>
+        <div class="kr-value">27.2% <span style="font-size:1rem;font-weight:500;color:var(--text-muted)">▲ 4.8 pts vs. 30 days to Sep 2</span></div>
+        <div class="kr-target" style="color:var(--critical)">Up from 23.9% on Sep 27 · 10.0% payment failed + 17.3% chose to leave. Retention's "Proper SaaS" card now only shows Oct 1–3 (3.1%), so the two readings still can't be reconciled. Target: churn down 7%.</div>
+        <div class="kr-bar"><span style="width:80%;background:var(--warning)"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="numbers">
+    <div class="section-head">
+      <div><span class="eyebrow">From Maher's dashboard · Overview &amp; Retention tabs</span><h2>Monthly numbers</h2></div>
+      <div class="section-note">MRR pulled from the Overview tile · corrected Sep 19: the two MRR figures are two calculation bases for the <i>same</i> day (paid-now vs. paid+in-retry), not this-month-vs-last-month.</div>
+    </div>
+    <div class="tile-grid">
+      <div class="tile">
+        <div class="t-label">MRR</div>
+        <div class="t-value">284,127</div>
+        <div class="t-delta down bad">▼ 6.5% vs same days last month</div>
+        <div class="t-foot">Paid-now basis, today. Stripe basis (paid+in retry) is 325,372. Sep 30 close: 291,390.</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Active Subscribers</div>
+        <div class="t-value">777</div>
+        <div class="t-delta down bad">▼ 6.5%</div>
+        <div class="t-foot">87.3% of all subscriptions · 113 in payment retry · Sep: +238 / −227 · Oct 1–3: +12 / −28</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">New Sales (Sep final)</div>
+        <div class="t-value">238</div>
+        <div class="t-delta down bad">▼ 41.1% vs Aug 1–30</div>
+        <div class="t-foot">Target: 400/month sustained (Aug hit 419) · Oct 1–3: 12 (▼ 63.6%)</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">New-Joiner Revenue</div>
+        <div class="t-value">98,430 <span style="font-size:0.8rem;color:var(--text-muted)">SAR</span></div>
+        <div class="t-foot">September's 239-member cohort, revenue collected to date (Retention cohort table). Mostly first payments; may include a few Oct 1–3 renewals.</div>
+      </div>
+      <div class="tile flag">
+        <div class="t-label">Churn Rate</div>
+        <div class="t-value">27.2%</div>
+        <div class="t-delta up bad">▲ 4.8 pts <span style="color:var(--text-muted);font-weight:500">(last 30 days vs. the 30 to Sep 2)</span></div>
+        <div class="t-foot">10.0% payment failed + 17.3% chose to leave · 246 of 904 left (Sep 3–Oct 2) · Retention "Proper SaaS" Oct 1–3: 3.1%</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Cash Collected (Sep final)</div>
+        <div class="t-value">328,327</div>
+        <div class="t-delta up good">▲ 3.2% vs Aug 1–30</div>
+        <div class="t-foot">887 payments · net of 3,285 SAR refunded (9) · Oct 1–3: 27,345</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Marketing Spend (Sep final)</div>
+        <div class="t-value">64,474 <span style="font-size:0.8rem;color:var(--text-muted)">SAR</span></div>
+        <div class="t-delta down good">▼ 24.4% vs Aug 1–30</div>
+        <div class="t-foot">Meta + TikTok, incl. platform fees · Oct 1–3: 3,639 SAR</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">At Risk</div>
+        <div class="t-value">113 <span style="font-size:0.8rem;color:var(--text-muted)">members</span></div>
+        <div class="t-foot">13% of base · 41,245 SAR at stake (was 139 / 50,735 on Sep 27)</div>
+      </div>
+      <div class="tile flag">
+        <div class="t-label">CAC</div>
+        <div class="t-value">271 <span style="font-size:0.8rem;color:var(--text-muted)">SAR</span></div>
+        <div class="t-foot">Blended, September (Marketing tab) · 272 SAR over the last 30 days · the dashboard shows no CAC delta</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">LTV : CAC</div>
+        <div class="t-value">4.3<span style="font-size:0.8rem;color:var(--text-muted)">×</span></div>
+        <div class="t-foot">LTV 1,183 SAR (cohort-survival, net of refunds; was 1,254 on Sep 27) · still above the 3× health bar</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <h3 style="font-size:0.88rem;margin-bottom:4px;">Last 7 days vs. the 7 days before</h3>
+      <p style="font-size:0.76rem;color:var(--text-muted);margin:0 0 10px;">Sep 26–Oct 2 vs. Sep 19–25. Both are full days only; today (Oct 3) is left out because it's still partial. MRR and Active Subscribers are point-in-time snapshots taken at the end of each week, not sums. Everything else is the total for that week. The latest week spans the turn of the month.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+        <thead><tr style="text-align:left;color:var(--text-muted);border-bottom:1px solid var(--border);">
+          <th style="padding:6px 8px 6px 0;">Metric</th><th style="padding:6px 8px;">Sep 19–25</th><th style="padding:6px 8px;">Sep 26–Oct 2</th><th style="padding:6px 0 6px 8px;">Change</th>
+        </tr></thead>
+        <tbody style="font-family:'IBM Plex Mono',monospace;">
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">MRR (paid now, at week end)</td><td style="padding:6px 8px;">285,185 SAR</td><td style="padding:6px 8px;">285,222 SAR</td><td style="padding:6px 0 6px 8px;">flat (+37 SAR)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">MRR (paid + in retry, at week end)</td><td style="padding:6px 8px;">337,015 SAR</td><td style="padding:6px 8px;">327,562 SAR</td><td style="padding:6px 0 6px 8px;color:var(--critical);">▼ 9,453 SAR (-2.8%)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Active Subscribers (at week end)</td><td style="padding:6px 8px;">780 (922 incl. retry)</td><td style="padding:6px 8px;">780 (896 incl. retry)</td><td style="padding:6px 0 6px 8px;color:var(--warning);">flat paid; ▼ 26 incl. retry</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Joined / left</td><td style="padding:6px 8px;">+34 / −59 (net −25)</td><td style="padding:6px 8px;">+49 / −82 (net −33)</td><td style="padding:6px 0 6px 8px;color:var(--critical);">More joining, but even more leaving</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">New Sales</td><td style="padding:6px 8px;">34</td><td style="padding:6px 8px;">49</td><td style="padding:6px 0 6px 8px;color:var(--good);">▲ 15 (+44.1%)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Cash Collected</td><td style="padding:6px 8px;">59,962 SAR</td><td style="padding:6px 8px;">85,512 SAR</td><td style="padding:6px 0 6px 8px;color:var(--good);">▲ 25,550 SAR (+42.6%)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Refunds</td><td style="padding:6px 8px;">0 SAR</td><td style="padding:6px 8px;">730 SAR (2)</td><td style="padding:6px 0 6px 8px;">▲ 2 refunds</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Ad Spend</td><td style="padding:6px 8px;">10,461 SAR</td><td style="padding:6px 8px;">11,328 SAR</td><td style="padding:6px 0 6px 8px;">▲ 867 SAR (+8.3%)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Ad-traced sales</td><td style="padding:6px 8px;">28</td><td style="padding:6px 8px;">32</td><td style="padding:6px 0 6px 8px;color:var(--good);">▲ 4 (+14.3%)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Cost per sale (ads)</td><td style="padding:6px 8px;">374 SAR</td><td style="padding:6px 8px;">354 SAR</td><td style="padding:6px 0 6px 8px;color:var(--good);">▼ 20 SAR (-5.2%)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">CAC (blended)</td><td style="padding:6px 8px;">308 SAR</td><td style="padding:6px 8px;">231 SAR</td><td style="padding:6px 0 6px 8px;color:var(--good);">▼ 77 SAR (-25%)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">ROAS (first-purchase / projected LTV)</td><td style="padding:6px 8px;">1.0 / 3.2</td><td style="padding:6px 8px;">1.0 / 3.3</td><td style="padding:6px 8px;color:var(--critical);">1.0 / 3.3</td><td style="padding:6px 0 6px 8px;color:var(--text-muted);">0.8 / 2.6</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Meta — spend → sales · ROAS</td><td style="padding:6px 8px;">6,146 SAR → 17 · 1.01</td><td style="padding:6px 8px;">6,274 SAR → 20 · 1.16</td><td style="padding:6px 0 6px 8px;color:var(--good);">ROAS ▲ 0.15</td></tr>
+          <tr><td style="padding:6px 8px 6px 0;font-family:inherit;">TikTok — spend → sales · ROAS</td><td style="padding:6px 8px;">4,315 SAR → 11 · 0.93</td><td style="padding:6px 8px;">5,054 SAR → 12 · 0.87</td><td style="padding:6px 0 6px 8px;color:var(--warning);">ROAS ▼ 0.06; still below 1</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.76rem;color:var(--text-muted);margin-top:10px;"><b style="color:var(--text-secondary);">Better selling week, worse retention week.</b> New sales rose to 49 and cash collected jumped 43%, with blended CAC down to 231 SAR. But 82 members left against 49 joining, so the paying-or-retrying base shrank by 33 and paid+retry MRR fell 2.8%; paid-now MRR held flat. Meta improved while TikTok stayed below breakeven. 16 of the 49 sales carry no ad platform in their lead source, so the ad-traced split is softer than usual.</p>
+    </div>
+
+    <div class="two-col" style="margin-top:12px;">
+      <div class="card">
+        <h3 style="font-size:0.88rem;margin-bottom:10px;">Customer lifetime vs. the full program</h3>
+        <p style="font-size:0.82rem;color:var(--text-secondary);margin:0 0 10px;">Average projected lifetime is <b class="mono" style="color:var(--text-primary)">3.28 months</b>, against a <b>12-month</b> Tamkeen → Mind Power → Ezdhar program. Only <b>27%</b> complete on average — most upsell revenue is never reached. Refund rate 1.43% overall (1.32% so far in Oct, on 1 refund).</p>
+        <div style="height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden;">
+          <span style="display:block;height:100%;width:27%;background:var(--accent);border-radius:4px;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--text-muted);margin-top:4px;"><span>Month 1</span><span>Month 12</span></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:0.88rem;margin-bottom:10px;">Payment-failure churn — 10.0% of members, last 30 days</h3>
+        <div class="reason"><div class="r-label">Insufficient funds</div><div class="r-track"><div class="r-fill" style="width:68.5%"></div></div><div class="r-val">68.5%</div></div>
+        <div class="reason"><div class="r-label">Declined by issuer</div><div class="r-track"><div class="r-fill" style="width:14.0%"></div></div><div class="r-val">14.0%</div></div>
+        <div class="reason"><div class="r-label">Card doesn't support purchase (SCA)</div><div class="r-track"><div class="r-fill" style="width:9.9%;background:var(--warning)"></div></div><div class="r-val">9.9%</div></div>
+        <p style="font-size:0.74rem;color:var(--text-muted);margin:4px 0 0;">Share of the 352 people with a failed charge in the last 30 days. Retries win back 42.6% overall, but only 15.0% of SCA failures. 21.9% of <i>first</i>-charge failures are SCA. Retention's own month-to-date reading is 1.7% for Oct 1–3.</p>
+        <p style="font-size:0.76rem;color:var(--warning);margin:8px 0 0;">"Card doesn't support purchase" is mostly Saudi cards on international rails — enabling <b>Mada</b> fixes most of this slice.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <h3 style="font-size:0.88rem;margin-bottom:4px;">New joiners vs. existing clients renewing</h3>
+      <p style="font-size:0.76rem;color:var(--text-muted);margin:0 0 10px;">September's and October's new-joiner revenue come from the Retention tab's cohort table (revenue collected from that signup month's members so far). For September that's mostly first payments but can include a few Oct 1–3 renewals from early-September joiners. July and August are estimated: scaled from the Media Buying tab's ad-traced "first-purchase revenue" up to the full new-sales count, assuming organic signups pay a similar first amount to ad-traced ones.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+        <thead><tr style="text-align:left;color:var(--text-muted);border-bottom:1px solid var(--border);">
+          <th style="padding:6px 8px 6px 0;">Month</th><th style="padding:6px 8px;">New joiners</th><th style="padding:6px 8px;">New-joiner revenue</th><th style="padding:6px 8px;">Renewal payments</th><th style="padding:6px 8px;">Renewal revenue</th><th style="padding:6px 0 6px 8px;">Total collected</th>
+        </tr></thead>
+        <tbody style="font-family:'IBM Plex Mono',monospace;">
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Jul 2026</td><td style="padding:6px 8px;">239</td><td style="padding:6px 8px;">~87,300 SAR <span style="font-family:inherit;color:var(--text-muted);">(est.)</span></td><td style="padding:6px 8px;">441</td><td style="padding:6px 8px;">~161,200 SAR <span style="font-family:inherit;color:var(--text-muted);">(est.)</span></td><td style="padding:6px 0 6px 8px;">248,452 SAR</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Aug 2026</td><td style="padding:6px 8px;">419</td><td style="padding:6px 8px;">~151,300 SAR <span style="font-family:inherit;color:var(--text-muted);">(est.)</span></td><td style="padding:6px 8px;">501</td><td style="padding:6px 8px;">~181,200 SAR <span style="font-family:inherit;color:var(--text-muted);">(est.)</span></td><td style="padding:6px 0 6px 8px;">332,534 SAR</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Sep 2026</td><td style="padding:6px 8px;">238</td><td style="padding:6px 8px;color:var(--text-primary);">98,430 SAR <span style="font-family:inherit;color:var(--good);">(cohort table)</span></td><td style="padding:6px 8px;">~649</td><td style="padding:6px 8px;">~229,900 SAR <span style="font-family:inherit;color:var(--text-muted);">(derived: total − new)</span></td><td style="padding:6px 0 6px 8px;">328,327 SAR</td></tr>
+          <tr><td style="padding:6px 8px 6px 0;font-family:inherit;">Oct 2026 (1–3, early)</td><td style="padding:6px 8px;">12</td><td style="padding:6px 8px;color:var(--text-primary);">4,380 SAR <span style="font-family:inherit;color:var(--good);">(cohort table)</span></td><td style="padding:6px 8px;">~60</td><td style="padding:6px 8px;">~22,965 SAR <span style="font-family:inherit;color:var(--text-muted);">(derived)</span></td><td style="padding:6px 0 6px 8px;">27,345 SAR</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.76rem;color:var(--text-muted);margin-top:10px;">Renewal payment counts = total payments in the period minus new sales (assumes ~1 payment per new joiner in their join month). Existing clients renewing are consistently the larger revenue line — roughly 60–70% of cash collected each month comes from people who already joined, not from that month's new signups.</p>
+    </div>
+
+  </section>
+
+  <section id="marketing">
+    <div class="section-head">
+      <div><span class="eyebrow">Marketing tab · refreshed Oct 3 to real calendar months</span><h2>Sales &amp; marketing — month over month</h2></div>
+      <div class="section-note">Jul → Aug was the growth month across the board; September closed well below it, and TikTok's ROAS stayed below breakeven. October is only 3 days in.</div>
+    </div>
+    <div class="card">
+      <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+        <thead><tr style="text-align:left;color:var(--text-muted);border-bottom:1px solid var(--border);">
+          <th style="padding:6px 8px 6px 0;">Metric</th><th style="padding:6px 8px;">Jul 2026</th><th style="padding:6px 8px;">Aug 2026</th><th style="padding:6px 8px;">Sep 2026</th><th style="padding:6px 0 6px 8px;">Oct 1–3 (early)</th>
+        </tr></thead>
+        <tbody style="font-family:'IBM Plex Mono',monospace;">
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Ad spend</td><td style="padding:6px 8px;">46,378 SAR</td><td style="padding:6px 8px;">88,426 SAR</td><td style="padding:6px 8px;">64,474 SAR</td><td style="padding:6px 0 6px 8px;color:var(--text-muted);">3,639 SAR</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Leads (ad-traced)</td><td style="padding:6px 8px;">1,053</td><td style="padding:6px 8px;">3,077</td><td style="padding:6px 8px;">1,107</td><td style="padding:6px 0 6px 8px;color:var(--text-muted);">52</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Cost per lead</td><td style="padding:6px 8px;">44 SAR</td><td style="padding:6px 8px;">29 SAR</td><td style="padding:6px 8px;">58 SAR</td><td style="padding:6px 0 6px 8px;color:var(--text-muted);">70 SAR</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Sales (ad-traced)</td><td style="padding:6px 8px;">175</td><td style="padding:6px 8px;">342</td><td style="padding:6px 8px;">179</td><td style="padding:6px 0 6px 8px;color:var(--text-muted);">8</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 8px 6px 0;font-family:inherit;">Cost per sale</td><td style="padding:6px 8px;">265 SAR</td><td style="padding:6px 8px;">259 SAR</td><td style="padding:6px 8px;color:var(--critical);">360 SAR</td><td style="padding:6px 0 6px 8px;color:var(--text-muted);">455 SAR</td></tr>
+          <tr><td style="padding:6px 8px 6px 0;font-family:inherit;">ROAS (first-purchase / projected LTV)</td><td style="padding:6px 8px;">1.4 / 5.4</td><td style="padding:6px 8px;">1.4 / 5.6</td><td style="padding:6px 0 6px 8px;color:var(--critical);">1.0 / 3.5</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.76rem;color:var(--text-muted);margin-top:10px;">September closed with cost per sale up 39% on August and projected-LTV ROAS down from 5.6 to 3.3, just above the 3.0 target. Part of that drop is the dashboard's lower LTV (now 1,183 SAR). October's first days read below target (0.8 / 2.6), but that's 8 sales, too few to read anything into yet.</p>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <div class="section-note" style="margin-bottom:10px;">Meta vs. TikTok — September (final)</div>
+      <div class="compare">
+        <div class="compare-metric">
+          <div class="cm-label">ROAS (first-purchase)</div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-meta)"></span><span class="cm-name">Meta</span><div class="cm-track"><div class="cm-fill" style="width:100%;background:var(--series-meta)"></div></div><span class="cm-val">1.20</span></div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-tiktok)"></span><span class="cm-name">TikTok</span><div class="cm-track"><div class="cm-fill" style="width:78%;background:var(--series-tiktok)"></div></div><span class="cm-val">0.93</span></div>
+        </div>
+        <div class="compare-metric">
+          <div class="cm-label">Cost per Sale (SAR, lower is better)</div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-meta)"></span><span class="cm-name">Meta</span><div class="cm-track"><div class="cm-fill" style="width:71%;background:var(--series-meta)"></div></div><span class="cm-val">301</span></div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-tiktok)"></span><span class="cm-name">TikTok</span><div class="cm-track"><div class="cm-fill" style="width:100%;background:var(--series-tiktok)"></div></div><span class="cm-val">425</span></div>
+        </div>
+        <div class="compare-metric">
+          <div class="cm-label">Cost per Lead (SAR, lower is better)</div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-meta)"></span><span class="cm-name">Meta</span><div class="cm-track"><div class="cm-fill" style="width:100%;background:var(--series-meta)"></div></div><span class="cm-val">58</span></div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-tiktok)"></span><span class="cm-name">TikTok</span><div class="cm-track"><div class="cm-fill" style="width:100%;background:var(--series-tiktok)"></div></div><span class="cm-val">58</span></div>
+        </div>
+        <div class="compare-metric">
+          <div class="cm-label">Spend (SAR) vs. Sales delivered</div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-meta)"></span><span class="cm-name">Meta</span><div class="cm-track"><div class="cm-fill" style="width:78%;background:var(--series-meta)"></div></div><span class="cm-val">28,312 → 94 sales</span></div>
+          <div class="cm-row"><span class="cm-swatch" style="background:var(--series-tiktok)"></span><span class="cm-name">TikTok</span><div class="cm-track"><div class="cm-fill" style="width:100%;background:var(--series-tiktok)"></div></div><span class="cm-val">36,162 → 85 sales</span></div>
+          <p style="font-size:0.76rem;color:var(--text-muted);margin:8px 0 0;">TikTok was the stronger channel in Jul–Aug (1.98 ROAS in July) but stayed below breakeven for all of September while taking 56% of the budget. Leads cost the same on both platforms (58 SAR); TikTok's leads just close less often. Last week: Meta 1.16 vs. TikTok 0.87. Oct 1–3: TikTok 0.41 (2 sales on 1,759 SAR) vs. Meta 1.17, on a very small sample.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sales">
+    <div class="section-head">
+      <div><span class="eyebrow">New · Maher's dashboard, /sales tab</span><h2>Sales — leads vs. closes (Maged)</h2></div>
+      <div class="section-note">Leads come in through GHL direct messages (WhatsApp/FB/IG/TikTok); Maged contacts them and closes the sale. Karim asked for this tracked here starting today.</div>
+    </div>
+    <div class="tile-grid">
+      <div class="tile">
+        <div class="t-label">New DM Leads</div>
+        <div class="t-value">2,513</div>
+        <div class="t-foot">Wrote in, never bought anything · 3,310 conversations · ▲ 10.6% vs prior 89 days</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Got a Reply (24h)</div>
+        <div class="t-value">93%</div>
+        <div class="t-foot">From a person · 2,325 of 2,497 leads</div>
+      </div>
+      <div class="tile flag">
+        <div class="t-label">Bought Through DS</div>
+        <div class="t-value">2.1%</div>
+        <div class="t-foot">Within 7 days · 49 of 2,387 leads · 2.9% within 30 days</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">DS Orders</div>
+        <div class="t-value">79</div>
+        <div class="t-foot">28,835 SAR in orders · 67 from leads who wrote in first · ▲ 17.9%</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Speed to Lead</div>
+        <div class="t-value">4.2 <span style="font-size:0.8rem;color:var(--text-muted)">h</span></div>
+        <div class="t-foot">Median first human reply · only 9% answered within 15 min, 46% took 4–24 h</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Dead Space</div>
+        <div class="t-value">8 <span style="font-size:0.8rem;color:var(--text-muted)">min</span></div>
+        <div class="t-foot">Median wait once the lead has answered us</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Charged (DS buyers)</div>
+        <div class="t-value">16,790 <span style="font-size:0.8rem;color:var(--text-muted)">SAR</span></div>
+        <div class="t-foot">First month · +13,505 SAR in renewals since</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Written Reply Lift</div>
+        <div class="t-value">3.4%</div>
+        <div class="t-foot">DS conversion when a person wrote back (31% of leads) vs. 2.1% overall. Correlation, not proof.</div>
+      </div>
+    </div>
+    <p style="font-size:0.76rem;color:var(--text-muted);margin-top:10px;">From <a href="https://ma-dashboard-theta.vercel.app/sales" target="_blank" rel="noopener">the /sales tab</a>, last 90 days (the tab's default window), refreshed Oct 3. The tab doesn't split by DM channel. A "sale" here is a completed order from Majed's Direct Sales funnel, read from GHL. The tab estimates ~7 IG/FB leads are double-counted when they reappear on WhatsApp. 60% of first replies are automated; when a person replies, it's a template 72% of the time.</p>
+  </section>
+
+  <section id="engagement">
+    <div class="section-head">
+      <div><span class="eyebrow">Engagement &amp; Retention tabs</span><h2>Who's active, who's stalling</h2></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3 style="font-size:0.88rem;margin-bottom:12px;">Where the 889 subscribed members stand</h3>
+        <div class="mix-bar">
+          <div style="width:20%;background:var(--good)"></div>
+          <div style="width:30%;background:var(--warning)"></div>
+          <div style="width:50%;background:var(--critical)"></div>
+        </div>
+        <div class="mix-legend">
+          <span class="li"><span class="dot" style="background:var(--good)"></span>Active this week — 175 (20%)</span>
+          <span class="li"><span class="dot" style="background:var(--warning)"></span>Cooling off (8–30d) — 269 (30%)</span>
+          <span class="li"><span class="dot" style="background:var(--critical)"></span>Cold (30d+) — 445 (50%)</span>
+        </div>
+        <p style="font-size:0.76rem;color:var(--text-muted);margin-top:10px;">195 of the cold members never recorded any activity at all. 377 cold members are still paying but not watching, and 68 are in card retry. Median time to finish week 1 is 3 days.</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:0.88rem;margin-bottom:4px;">Aug 2026 cohort — week-by-week finish rate</h3>
+        <p style="font-size:0.74rem;color:var(--text-muted);margin:0 0 6px;">n=414 · % of cohort finishing that week on schedule</p>
+        <div class="funnel">
+          <div class="funnel-col"><span class="funnel-pct">37%</span><div class="funnel-bar" style="height:80px;background:var(--seq-4)"></div><span class="funnel-lbl">Week 1</span></div>
+          <div class="funnel-col"><span class="funnel-pct">20%</span><div class="funnel-bar" style="height:44px;background:var(--seq-3)"></div><span class="funnel-lbl">Week 2</span></div>
+          <div class="funnel-col"><span class="funnel-pct">11%</span><div class="funnel-bar" style="height:24px;background:var(--seq-2)"></div><span class="funnel-lbl">Week 3</span></div>
+          <div class="funnel-col"><span class="funnel-pct">9.9%</span><div class="funnel-bar" style="height:21px;background:var(--seq-1)"></div><span class="funnel-lbl">Week 4</span></div>
+        </div>
+        <p style="font-size:0.76rem;color:var(--text-muted);margin-top:6px;">Aug is the latest cohort with all four weeks matured (week 4: 41 of 414). The Sep cohort (n=234) is tracking about the same: 38% week 1, 21% week 2, 9.9% week 3, and an early 12% week 4 on only 25 members. Steepest drop is week 1→2. Top stall point: "التدريب الثالث – البقاء داخل الموقف لفترة أطول" (10% of cold members' last lesson).</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <h3 style="font-size:0.88rem;margin-bottom:6px;">A caution on the obvious assumption</h3>
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin:0;">The dashboard's own "Does Week 1 Predict Staying?" widget shows <b>97%</b> of members who finished week 1 are still active at day 30, vs. <b>94%</b> of those who didn't (172 of 178 vs. 192 of 205 members). Essentially no difference so far, and the day-60 read has no matured members yet. Sample is still small per the dashboard's own caveat, but it's worth not assuming onboarding activation is the whole churn story until this firms up.</p>
+    </div>
+  </section>
+
+  <section id="team">
+    <div class="section-head">
+      <div><span class="eyebrow">Master Initiative Tracker — Sept 2026 (Asana), built Sep 24</span><h2>What everyone's working on</h2></div>
+    </div>
+    <p style="font-size:0.82rem;color:var(--text-secondary);max-width:72ch;margin:0 0 16px;">Karim had the team consolidate onto one board, and this is now the only Asana view this dashboard reads. It's not task-count or overdue tracking — due dates and priority are still blank on all 31 items — what's below is each person's own reported status, blockers and next step for their current initiatives, as logged on the board. Still not using open/overdue metadata as a proxy for who's working, per Karim's standing call on that.</p>
+    <div class="team-grid">
+
+      <div class="person">
+        <div class="person-head"><div><div class="person-name">Hisham</div><div class="person-role">Academy Manager</div></div></div>
+        <ul>
+          <li>Tahaluf Tamkeen Launch (8-week edition) — in progress, blocked on Maher + design contributors for Week 1 assets</li>
+          <li>Ezdehar migration off Teachable to GoHighLevel/GoKollab — in progress, waiting on Maher's interactive assessment tool</li>
+          <li>Coaching pilot (4 slots/month) — building the GHL booking calendar, opens around pilot day 14</li>
+        </ul>
+        <div class="note">Plus 3 more ongoing (community management, the webinar cycle, a Skool benchmark study). Also still carries commercial/P&amp;L and product-roadmap scope from before Karim joined — see Roles &amp; Escalation in the framework doc for the handoff conversation that's still needed.</div>
+      </div>
+
+      <div class="person">
+        <div class="person-head"><div><div class="person-name">Ahmed Maher</div><div class="person-role">Growth &amp; Systems</div></div></div>
+        <ul>
+          <li>TikTok landing page rebuild — done, rolling to 100% of traffic; next is a video-testimonial A/B test</li>
+          <li>Funnel rebuild (7 funnels on custom code) — nearly done, one 30% A/B test left before full rollout</li>
+          <li>Business dashboard (the one this Control Room reads from) — nearly complete, still doing accuracy checks</li>
+          <li>3 initiatives — Bundle Upsell, Ezdhar Webinar Funnel, Quiz Funnel — all blocked on the same thing: copy from Raed</li>
+        </ul>
+        <div class="note">In-House Media Buying automation is built and tested but paused until ad performance recovers; the Big-Picture Marketing Analysis is ready to present, just needs a meeting on the calendar. Broadest scope on the team — growth, retention automations, paid media, and the dashboard all sit with him.</div>
+      </div>
+
+      <div class="person">
+        <div class="person-head"><div><div class="person-name">Ahmed Sayed</div><div class="person-role">GHL Admin &amp; Retention</div></div></div>
+        <ul>
+          <li>HyperPay — approved and production-ready, on hold until the business license renews (expected mid-to-late Oct)</li>
+          <li>Tamara — live keys arrived Sep 22, building the main checkout structure this week</li>
+          <li>Tabby — test environment submitted, waiting on Tabby's own ~3-day approval window</li>
+        </ul>
+        <div class="note">All three installment integrations are moving in parallel at different stages — the two areas closest to the churn numbers above. Also flagged on his own tasks: no formal escalation path yet for refund/dispute calls in the 25–30 tickets/day support queue.</div>
+      </div>
+
+      <div class="person">
+        <div class="person-head"><div><div class="person-name">Raed</div><div class="person-role">Content Creator</div></div></div>
+        <ul>
+          <li>Organic content calendar — week 1 of a 5-week cycle done, 4 weeks left</li>
+          <li>Cancellation follow-up calls — not started yet; plan is to call 10 recently-cancelled subscribers to learn why</li>
+          <li>Blocked: the Meta account is currently restricted from posting Stories</li>
+        </ul>
+        <div class="note">The cancellation calls are worth watching directly against the churn numbers above once they happen. He's also the copy dependency holding up 3 of Maher's funnels (Bundle Upsell, Ezdhar Webinar, Quiz Funnel).</div>
+      </div>
+
+      <div class="person">
+        <div class="person-head"><div><div class="person-name">Moaz</div><div class="person-role">Video Editor</div></div></div>
+        <ul>
+          <li>Week 3 ad/video batch — 1 lecture, 4 ad sets and 6 edits done; 4 ads remaining</li>
+        </ul>
+        <div class="note">Just got a named owner on the tracker board today (previously unassigned) — only one item is currently logged for him there; worth checking whether the rest of his queue needs adding.</div>
+      </div>
+
+      <div class="person">
+        <div class="person-head"><div><div class="person-name">Maged</div><div class="person-role">Sales (Conversion)</div></div></div>
+        <ul>
+          <li>Lead qualification &amp; conversion, daily sales messaging, and following up with interested-not-yet-purchased customers — all ongoing</li>
+          <li>No Asana account, so his 4 items on the board are unassigned there and tracked by name only</li>
+        </ul>
+        <div class="note">Flagged needs from his own notes: current pricing/offers, guaranteed platform access, and a consistent follow-up process. Conversion rate itself is still tracked through GHL/sales data, not this board — worth a live tile here once connected.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="insights">
+    <div class="section-head">
+      <div><span class="eyebrow">What the numbers add up to</span><h2>Insights</h2></div>
+    </div>
+    <div class="insight-grid">
+      <div class="insight">
+        <span class="tag">Process, not people</span>
+        <h3>The board finally has real, self-reported status</h3>
+        <p>Karim had the team consolidate onto one Asana board (Master Initiative Tracker, built Sep 24) — 31 items, each with the owner's own status, blockers and next step. Due dates and priority are still blank across the board, so it's not live tracking yet, but it's the richest single "who's doing what" source so far. See the Team section for what it says.</p>
+      </div>
+      <div class="insight warn">
+        <span class="tag">Spend</span>
+        <h3>TikTok is burning cash below breakeven</h3>
+        <p>September final: ROAS 0.93 vs. Meta's 1.20, on 1.3× Meta's spend, for a worse cost per sale (425 vs. 301 SAR). Last week it was 0.87 vs. 1.16, and the first days of October read 0.41 (small sample). Still the clearest lever to improve CAC without adding budget.</p>
+      </div>
+      <div class="insight warn">
+        <span class="tag">Data quality</span>
+        <h3>Two churn numbers, same dashboard</h3>
+        <p>Overview's rolling 30-day churn rose to 27.2% (from 23.9% on Sep 27). Retention's recommended "Proper SaaS" card only shows the current month, now Oct 1–3 (3.1%), so September's figure on that method isn't readable as a number. Neither should anchor a KR target until Maher confirms which one is canonical.</p>
+      </div>
+      <div class="insight good">
+        <span class="tag">Quick win</span>
+        <h3>A named, buyable fix for involuntary churn</h3>
+        <p>9.9% of people with failed payments are on cards that "don't support purchase" (mostly Saudi cards on international rails). Retries only recover 15.0% of these, and they cause 21.9% of first-charge failures for brand-new customers. Enabling Mada is a bounded, concrete fix sitting directly in the data.</p>
+      </div>
+      <div class="insight">
+        <span class="tag">Revenue ceiling</span>
+        <h3>Members leave before the upsell even starts</h3>
+        <p>3.28-month average lifetime against a 12-month program, 27% completion on average. Half of starters are gone by their 3rd payment. Almost all Mind Power / Ezdhar revenue is currently unrealized.</p>
+      </div>
+      <div class="insight good">
+        <span class="tag">Pipeline health</span>
+        <h3>All data feeds are healthy again</h3>
+        <p>Settings → Sync Status still shows every source healthy as of Oct 3 (GHL Contacts, Stripe, Meta, TikTok, GHL chat and orders). GHL Funnels, stale since ~Aug 25, is no longer listed. It isn't clear yet whether it was fixed, replaced by the new "GHL orders" feed, or retired.</p>
+      </div>
+      <div class="insight">
+        <span class="tag">Worth watching, not concluding</span>
+        <h3>Week-1 completion may not predict 30-day retention</h3>
+        <p>97% vs. 94% retention regardless of week-1 completion (n=178 vs. 205), on a still-small sample. If this holds, churn may not be the onboarding-activation story it's assumed to be.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="directives">
+    <div class="section-head">
+      <div><span class="eyebrow">Drafted for you to send — I never message the team directly</span><h2>Today's directives</h2></div>
+    </div>
+    <div class="card">
+      <div class="directive"><div class="num">1</div><div><span class="to">To Maher</span><p>Which is our real churn number — the 27.2% rolling 30-day rate on Overview or Retention's "Proper SaaS" monthly figure — and can Retention show last month's number, not just the current month?</p></div></div>
+      <div class="directive"><div class="num">2</div><div><span class="to">To Maher</span><p>Let's pause or renegotiate TikTok — it stayed under breakeven all of September (0.93 ROAS vs. Meta's 1.20) while taking 56% of the budget, and it's at 0.41 in October's first days.</p></div></div>
+      <div class="directive"><div class="num">3</div><div><span class="to">To Maher</span><p>GHL Funnels no longer shows in Sync Status and everything reads healthy — was it fixed or retired, and does anything that relied on it need a backfill for the ~month it was stale?</p></div></div>
+      <div class="directive"><div class="num">4</div><div><span class="to">To Maher</span><p>Let's set 15 minutes for you to walk me through what's actually on your plate right now — that'll tell us more than any tool will.</p></div></div>
+      <div class="directive"><div class="num">5</div><div><span class="to">To Hisham &amp; Maher</span><p>Let's get Raed and Moaz into whatever daily check-in habit we start with the rest of the team, so their work is visible too.</p></div></div>
+      <div class="directive"><div class="num">6</div><div><span class="to">To Sayed</span><p>Can you scope enabling Mada as a payment method? It looks like it would directly cut a real chunk of our payment-failure churn.</p></div></div>
+    </div>
+  </section>
+
+  <section id="gaps">
+    <div class="section-head">
+      <div><span class="eyebrow">Carried from the RevOps Operating Framework doc</span><h2>Open decisions &amp; gaps</h2></div>
+    </div>
+    <div class="card gap-list">
+      <div class="gap-item"><span class="gdot" style="background:var(--good)"></span><span><b>Overall revenue &amp; churn targets — set by Karim.</b> Churn target: down 7%. New-joiner target: 400/month sustained — near-term goal is stabilizing back at August's pace (419); September closed at 238, well short, and October has 12 in its first 3 days.</span></div>
+      <div class="gap-item"><span class="gdot" style="background:var(--good)"></span><span><b>Tamkeen pipeline — resolved.</b> "V2 - Tamkeen" is the active one in GHL — it's still taking new opportunities today. The two legacy pipelines ("Tamkeen," "Tamkeen Pipeline," together ~13,000 historical opportunities) have had zero new activity since ~Apr 20, 2026 — safe to treat as dead and eventually archive.</span></div>
+      <div class="gap-item"><span class="gdot" style="background:var(--good)"></span><span><b>Agency name — resolved.</b> No name needed; refer to it as "Marketing Agency." Owner is Tareq.</span></div>
+      <div class="gap-item"><span class="gdot" style="background:var(--good)"></span><span><b>Social media manager — no longer a gap.</b> Maged is covering DM response, so this seat isn't being filled.</span></div>
+      <div class="gap-item"><span class="gdot" style="background:var(--good)"></span><span><b>Sales tab (Maged) — now populated.</b> Maher's dashboard /sales tab tracks GHL-DM leads vs. Maged's Direct Sales orders, per Karim's request. Refreshed Oct 3 (last 90 days); see the Sales section above. 2.1% of DM leads buy through DS within 7 days, and median speed to lead is 4.2 h.</span></div>
+    </div>
+  </section>
+
+  <footer>
+    This is a snapshot, not a live feed: dashboard figures reflect Maher's tool as of Oct 3, ~3:45 PM Riyadh (sources synced ~06:10 Riyadh); Asana figures were pulled live at build time. I'll refresh and republish this each morning as part of the daily review — tell me if you'd like the Asana-sourced sections on an automated daily refresh as well.
+  </footer>
+
+</div>
+
+</body></html>
